@@ -1,0 +1,32 @@
+<!-- templates/usuarios.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Gestión de Usuarios</title></head>
+<body>
+  <h2>Agregar Usuario</h2>
+  <form method="POST">
+    <label>Usuario: <input type="text" name="usuario" required></label><br>
+    <label>Contraseña: <input type="password" name="password" required></label><br>
+    <label>Rol:
+      <select name="rol">
+        <option value="vendedor">Vendedor</option>
+        <option value="admin">Administrador</option>
+      </select>
+    </label><br>
+    <button type="submit">Agregar</button>
+  </form>
+
+  <h2>Lista de Usuarios</h2>
+  <table border="1">
+    <tr><th>Usuario</th><th>Rol</th></tr>
+    {% for u in usuarios %}
+    <tr>
+      <td>{{ u.usuario }}</td>
+      <td>{{ u.rol }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <p><a href="/menu">Volver al menú</a></p>
+</body>
+</html>

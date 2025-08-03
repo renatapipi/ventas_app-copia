@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Panel de Venta</title>
+</head>
+<body>
+  <h2>Panel de Venta</h2>
+
+  <!-- Filtro por marca y búsqueda por nombre -->
+  <form method="GET" action="/venta">
+    <label>Filtrar por Marca:
+      <select name="marca" onchange="this.form.submit()">
+        <option value="">Todas</option>
+        {% for m in marcas %}
+          <option value="{{ m }}" {% if m == marca_filtro %}selected{% endif %}>{{ m }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label>Buscar por Nombre:
+      <input type="text" name="nombre" value="{{ nombre_busqueda }}" oninput="this.form.submit()" />
+    </label>
+  </form>
+
+  <hr />
+
+  <!-- Formulario de venta -->
+  <form method="POST" action="/venta">
+    <label>Producto:
+      <select name="producto" id="producto" onchange="actualizarPrecio()">
+  {% for p in productos %}
+    <option value="{{ p.nombre }}" data-precio="{{ p.precio }}" data-costo="{{ p.costo }}">
+      {{ p.nombre }}
+    </option>
+  {% endfor %}
+</select>
+
+    </label><br>
+
+    <label>Precio Unitario: $<span id="precio_unitario">0.00</span></label><br>
+
+    <label>Cantidad: <input type="number" id="cantidad" name="cantidad" min="1" value="1" required oninput="calcularTotal()"></label><br>
+    <label>Descuento (%): <input type="number" id="descuento" name="descuento" min="0" max="100" step="0.01" value="0" oninput="calcularTotal()"></label><br>
+    <label>Recargo (%): <input type="number" id="recargo" name="recargo" min="0" max="100" step="0.01" value="0" oninput="calcularTotal()"></label><br>
+
+    <label>Forma de Pago:
+      <select name="forma_pago">
+        <option value="Efectivo">Efectivo</option>
+        <option value="Tarjeta">Tarjeta</option>
+        <option value="Transferencia">Transferencia</option>
+        <option value="Otro">Otro</option>
+      </select>
+    </label><br>
+
+    <label>Total: $<span id="total">0.00</span></label><br>
+
+    <button type="submit">Grabar Venta y Descargar Recibo</button>
+  </form>
+
+  <p><a href="/menu">Volver al menú</a></p>
+
+  <script>
+    function actualizarPrecio() {
+      const select = document.getElementById('producto');
+      const opcion = select.options[select.selectedIndex];
+      const precio = parseFloat(opcion.getAttribute('data-precio')) || 0;
+      document.getElementById('precio_unitario').textContent = precio.toFixed(2);
+      calcularTotal();
+    }
+
+    function calcularTotal() {
+      const precio = parseFloat(document.getElementById('precio_unitario').textContent) || 0;
+      const cantidad = parseInt(document.getElementById('cantidad').value) || 0;
+      const descuento = parseFloat(document.getElementById('descuento').value) || 0;
+      const recargo = parseFloat(document.getElementById('recargo').value) || 0;
+
+      let subtotal = precio * cantidad;
+      let total = subtotal - (subtotal * descuento / 100) + (subtotal * recargo / 100);
+      document.getElementById('total').textContent = total.toFixed(2);
+    }
+
+    window.onload = function() {
+      actualizarPrecio();
+    }
+  </script>
+</body>
+</html>
+
+

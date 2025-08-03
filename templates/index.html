@@ -1,0 +1,20 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Menú Principal</title></head>
+<body>
+  <h2>Bienvenido {{ usuario }} (Rol: {{ rol }})</h2>
+  <ul>
+    {% if rol == 'admin' %}
+    
+    <li><a href="/productos">Gestión de Productos</a></li>
+    <li><a href="/usuarios">Gestión de Usuarios</a></li>
+    <li><a href="/ventas">Ver Historial de Ventas</a></li>
+  
+    {% endif %}
+    <li><a href="/venta">Realizar Venta</a></li>
+    <li><a href="/logout">Cerrar sesión</a></li>
+  </ul>
+</body>
+</html>
+

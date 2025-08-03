@@ -1,0 +1,24 @@
+<!-- templates/ventas.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Historial de Ventas</title></head>
+<body>
+  <h2>Historial de Ventas</h2>
+  <table border="1">
+    <tr><th>Producto</th><th>Cantidad</th><th>Vendedor</th><th>Ganancia</th><th>Total</th></tr>
+    {% for v in ventas %}
+    <tr>
+      <td>{{ v.producto }}</td>
+      <td>{{ v.cantidad }}</td>
+      <td>{{ v.vendedor }}</td>
+      <td>{{ v.ganancia }}</td>
+      <td>{{ v.total }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <p><strong>Total ventas:</strong> ${{ total }}</p>
+  <p><strong>Ganancia total:</strong> ${{ ganancia }}</p>
+  <p><a href="/menu">Volver al menú</a></p>
+</body>
+</html>
+
