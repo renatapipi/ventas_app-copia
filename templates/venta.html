@@ -1,90 +1,490 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Panel de Venta</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Venta</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        select, input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+        .form-col {
+            flex: 1;
+        }
+        .resumen-venta {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border: 1px solid #eee;
+        }
+        .resumen-venta p {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+        .resumen-venta .total {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #2c3e50;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            margin-top: 15px;
+        }
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .btn-cc {
+            background-color: #e67e22;
+        }
+        .btn-cc:hover {
+            background-color: #d35400;
+        }
+        .stock-warning {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        .toast-notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast-notification.success {
+            background: #27ae60;
+        }
+        .toast-notification.error {
+            background: #e74c3c;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .modal-actions button {
+            flex: 1;
+        }
+        .cc-notice {
+            color: #e67e22;
+            font-weight: bold;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+        .btn-volver {
+        display: inline-block;
+        background: #7f8c8d; /* gris */
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 14px;
+        margin-top: 10px;
+        transition: background 0.3s ease;
+    }
+    .btn-volver:hover {
+        background: #606060;
+    }
+    </style>
 </head>
 <body>
-  <h2>Panel de Venta</h2>
+    <div class="container">
+        <h1><i class="fas fa-cash-register"></i> Registrar Venta</h1>
+        
+        <form id="venta-form">
+            <div class="form-row">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="producto">Producto *</label>
+                        <select id="producto" name="producto" required>
+                            <option value="">Seleccione un producto</option>
+                            {% for producto in productos %}
+                            <option value="{{ producto.id }}" 
+                                    data-precio="{{ producto.precio }}" 
+                                    data-stock="{{ producto.stock }}">
+                                {{ producto.nombre }} - ${{ producto.precio }} (Stock: {{ producto.stock }})
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cliente">Cliente</label>
+                        <select id="cliente" name="cliente">
+                            <option value="Consumidor Final">Consumidor Final</option>
+                            {% for cliente in clientes %}
+                            <option value="{{ cliente.nombre }}">{{ cliente.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="forma_pago">Forma de Pago *</label>
+                        <select id="forma_pago" name="forma_pago" required>
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Tarjeta">Tarjeta</option>
+                            <option value="Transferencia">Transferencia</option>
+                            <option value="Cuenta Corriente">Cuenta Corriente</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-col">
+                    <div class="form-group">
+                        <label for="cantidad">Cantidad *</label>
+                        <input type="number" id="cantidad" name="cantidad" min="1" value="1" required>
+                        <div id="stock-warning" class="stock-warning">
+                            <i class="fas fa-exclamation-triangle"></i> Stock insuficiente
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="descuento">Descuento ($)</label>
+                        <input type="number" id="descuento" name="descuento" min="0" step="0.01" value="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="observaciones">Observaciones</label>
+                        <textarea id="observaciones" name="observaciones" rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="resumen-venta">
+                <h3>Resumen de Venta</h3>
+                <p>Subtotal: <span id="subtotal">$0.00</span></p>
+                <p>Descuento: <span id="descuento-resumen">$0.00</span></p>
+                <p class="total">Total: <span id="total-preview">$0.00</span></p>
+            </div>
+            
+            <button type="submit" id="btn-registrar-venta" class="btn">
+                <i class="fas fa-save"></i> Registrar Venta
+            </button>
+            <a href="/menu" class="btn-volver">
+    <i class="fas fa-arrow-left"></i> Volver al Menú
+</a>
+        </form>
+    </div>
+    
+    <!-- Modal de confirmación -->
+    <div id="modal-confirmacion" class="modal">
+        <div class="modal-content">
+            <div class="modal-body">
+                <!-- Contenido dinámico -->
+            </div>
+        </div>
+    </div>
 
-  <!-- Filtro por marca y búsqueda por nombre -->
-  <form method="GET" action="/venta">
-    <label>Filtrar por Marca:
-      <select name="marca" onchange="this.form.submit()">
-        <option value="">Todas</option>
-        {% for m in marcas %}
-          <option value="{{ m }}" {% if m == marca_filtro %}selected{% endif %}>{{ m }}</option>
-        {% endfor %}
-      </select>
-    </label>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurar eventos
+        setupEventListeners();
+        
+        // Establecer cantidad por defecto a 1 y calcular
+        document.getElementById('cantidad').value = 1;
+        actualizarImporte();
+    });
 
-    <label>Buscar por Nombre:
-      <input type="text" name="nombre" value="{{ nombre_busqueda }}" oninput="this.form.submit()" />
-    </label>
-  </form>
-
-  <hr />
-
-  <!-- Formulario de venta -->
-  <form method="POST" action="/venta">
-    <label>Producto:
-      <select name="producto" id="producto" onchange="actualizarPrecio()">
-  {% for p in productos %}
-    <option value="{{ p.nombre }}" data-precio="{{ p.precio }}" data-costo="{{ p.costo }}">
-      {{ p.nombre }}
-    </option>
-  {% endfor %}
-</select>
-
-    </label><br>
-
-    <label>Precio Unitario: $<span id="precio_unitario">0.00</span></label><br>
-
-    <label>Cantidad: <input type="number" id="cantidad" name="cantidad" min="1" value="1" required oninput="calcularTotal()"></label><br>
-    <label>Descuento (%): <input type="number" id="descuento" name="descuento" min="0" max="100" step="0.01" value="0" oninput="calcularTotal()"></label><br>
-    <label>Recargo (%): <input type="number" id="recargo" name="recargo" min="0" max="100" step="0.01" value="0" oninput="calcularTotal()"></label><br>
-
-    <label>Forma de Pago:
-      <select name="forma_pago">
-        <option value="Efectivo">Efectivo</option>
-        <option value="Tarjeta">Tarjeta</option>
-        <option value="Transferencia">Transferencia</option>
-        <option value="Otro">Otro</option>
-      </select>
-    </label><br>
-
-    <label>Total: $<span id="total">0.00</span></label><br>
-
-    <button type="submit">Grabar Venta y Descargar Recibo</button>
-  </form>
-
-  <p><a href="/menu">Volver al menú</a></p>
-
-  <script>
-    function actualizarPrecio() {
-      const select = document.getElementById('producto');
-      const opcion = select.options[select.selectedIndex];
-      const precio = parseFloat(opcion.getAttribute('data-precio')) || 0;
-      document.getElementById('precio_unitario').textContent = precio.toFixed(2);
-      calcularTotal();
+    // Función para configurar los event listeners
+    function setupEventListeners() {
+        // Eventos para actualización automática
+        document.getElementById('producto').addEventListener('change', actualizarImporte);
+        document.getElementById('cantidad').addEventListener('input', actualizarImporte);
+        document.getElementById('descuento').addEventListener('input', actualizarImporte);
+        document.getElementById('forma_pago').addEventListener('change', actualizarImporte);
+        
+        // Evento para enviar formulario
+        document.getElementById('venta-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            procesarVenta();
+        });
     }
 
-    function calcularTotal() {
-      const precio = parseFloat(document.getElementById('precio_unitario').textContent) || 0;
-      const cantidad = parseInt(document.getElementById('cantidad').value) || 0;
-      const descuento = parseFloat(document.getElementById('descuento').value) || 0;
-      const recargo = parseFloat(document.getElementById('recargo').value) || 0;
+    // Función para actualizar el importe en tiempo real
+    function actualizarImporte() {
+        const producto = document.getElementById('producto');
+        const cantidad = document.getElementById('cantidad');
+        const descuento = document.getElementById('descuento');
+        
+        // Asegurar que la cantidad mínima sea 1
+        if (cantidad.value < 1 || cantidad.value === '') {
+            cantidad.value = 1;
+        }
 
-      let subtotal = precio * cantidad;
-      let total = subtotal - (subtotal * descuento / 100) + (subtotal * recargo / 100);
-      document.getElementById('total').textContent = total.toFixed(2);
+        // Solo calcular si hay producto seleccionado
+        if (producto.selectedIndex > 0) {
+            const precio = parseFloat(producto.options[producto.selectedIndex].dataset.precio);
+            const cantidadValor = parseInt(cantidad.value) || 1;
+            const descuentoValor = parseFloat(descuento.value) || 0;
+            
+            const subtotal = precio * cantidadValor;
+            const total = Math.max(0, subtotal - descuentoValor);
+            
+            // Actualizar la interfaz
+            document.getElementById('subtotal').textContent = '$' + subtotal.toFixed(2);
+            document.getElementById('descuento-resumen').textContent = '$' + descuentoValor.toFixed(2);
+            document.getElementById('total-preview').textContent = '$' + total.toFixed(2);
+            
+            // Validar stock
+            validarStock();
+        } else {
+            // Resetear valores si no hay producto seleccionado
+            document.getElementById('subtotal').textContent = '$0.00';
+            document.getElementById('descuento-resumen').textContent = '$0.00';
+            document.getElementById('total-preview').textContent = '$0.00';
+        }
     }
 
-    window.onload = function() {
-      actualizarPrecio();
+    // Función para validar stock disponible
+    function validarStock() {
+        const producto = document.getElementById('producto');
+        const cantidad = document.getElementById('cantidad');
+        const stockWarning = document.getElementById('stock-warning');
+        
+        if (producto.selectedIndex > 0 && cantidad.value) {
+            const stock = parseInt(producto.options[producto.selectedIndex].dataset.stock);
+            const cantidadValor = parseInt(cantidad.value);
+            
+            if (cantidadValor > stock) {
+                stockWarning.style.display = 'block';
+                cantidad.setCustomValidity('Cantidad excede el stock disponible');
+                cantidad.value = stock;
+                actualizarImporte();
+            } else {
+                stockWarning.style.display = 'none';
+                cantidad.setCustomValidity('');
+            }
+        }
     }
-  </script>
-</body>
-</html>
 
+    // Función para procesar la venta
+    function procesarVenta() {
+        const formaPago = document.getElementById('forma_pago').value;
+        const cliente = document.getElementById('cliente').value;
+        
+        // Validación para cuentas corrientes
+        if (formaPago === 'Cuenta Corriente' && cliente === 'Consumidor Final') {
+            mostrarNotificacion('Para ventas a cuenta corriente debe seleccionar un cliente registrado', 'error');
+            return;
+        }
 
+        // Mostrar carga
+        const btnVenta = document.getElementById('btn-registrar-venta');
+        btnVenta.disabled = true;
+        btnVenta.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+
+        // Crear objeto con los datos del formulario
+        const formData = new FormData(document.getElementById('venta-form'));
+        
+        // Enviar datos al servidor
+        fetch('/venta', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                mostrarNotificacion('Venta registrada correctamente', 'success');
+                mostrarModalConfirmacion(data);
+                
+                // Si es cuenta corriente, mostrar mensaje especial
+                if (data.es_cuenta_corriente) {
+                    mostrarNotificacion('Venta registrada como cuenta corriente', 'success');
+                }
+
+                // REFRESH AUTOMÁTICO después de 2 segundos
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+
+            } else {
+                mostrarNotificacion(data.message || 'Error al registrar la venta', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            mostrarNotificacion('Error al conectar con el servidor', 'error');
+        })
+        .finally(() => {
+            btnVenta.disabled = false;
+            btnVenta.innerHTML = '<i class="fas fa-save"></i> Registrar Venta';
+        });
+    }
+
+    // Función para mostrar notificación
+    function mostrarNotificacion(mensaje, tipo) {
+        const toast = document.createElement('div');
+        toast.className = `toast-notification ${tipo}`;
+        toast.innerHTML = `
+            <div class="toast-icon">
+                ${tipo === 'success' ? '✓' : '⚠'}
+            </div>
+            <div class="toast-message">${mensaje}</div>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // Mostrar y luego eliminar después de 3 segundos
+        setTimeout(() => {
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }, 100);
+    }
+
+    // Función para mostrar el modal de confirmación
+    function mostrarModalConfirmacion(data) {
+        let detalles = '';
+        
+        if (data) {
+            detalles = `
+                <div class="detalle-venta">
+                    <p><strong>Producto:</strong> ${data.producto}</p>
+                    <p><strong>Cantidad:</strong> ${data.cantidad}</p>
+                    <p><strong>Total:</strong> $${data.total}</p>
+                    ${data.saldo_pendiente ? `
+                        <p><strong>Saldo Pendiente:</strong> $${data.saldo_pendiente}</p>
+                        <p class="cc-notice">
+                            <i class="fas fa-exclamation-circle"></i> 
+                            Esta venta ha sido registrada como cuenta corriente
+                        </p>
+                    ` : ''}
+                </div>
+            `;
+        }
+        
+        document.querySelector('.modal-body').innerHTML = `
+            <p><i class="fas fa-check-circle"></i> Venta registrada correctamente</p>
+            ${detalles}
+            <div class="modal-actions">
+                <button onclick="window.location.href='/menu'">Volver al Menú</button>
+                ${data.es_cuenta_corriente ? 
+                    '<button onclick="window.location.href=\'/cuentas_corrientes\'">Ver Cuentas Corrientes</button>' : ''}
+                <button onclick="cerrarModal()">Nueva Venta</button>
+                ${data.venta_id ? 
+                    `<button onclick="abrirRecibo(${data.venta_id})" class="btn-generar-recibo">
+                        <i class="fas fa-file-invoice"></i> Generar Recibo
+                     </button>` : ''}
+            </div>
+        `;
+        
+        document.getElementById('modal-confirmacion').style.display = 'flex';
+    }
+
+    function abrirRecibo(ventaId) {
+        window.open('/recibo/' + ventaId, '_blank');
+    }
+
+    // Función para cerrar el modal
+    function cerrarModal() {
+        document.getElementById('modal-confirmacion').style.display = 'none';
+        document.getElementById('venta-form').reset();
+        document.getElementById('cantidad').value = 1;
+        actualizarImporte();
+    }
+</script>

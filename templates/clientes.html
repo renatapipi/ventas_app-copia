@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gestión de Clientes</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; background: #f0f4f8; }
+    h2 { color: #2c3e50; }
+    form {
+      background: white; padding: 1.5em; border-radius: 8px; max-width: 400px;
+      margin-bottom: 2em;
+    }
+    label { display: block; margin-top: 1em; font-weight: bold; }
+    input[type=text], input[type=tel] {
+      width: 100%; padding: 8px; margin-top: 0.5em;
+      border: 1px solid #ccc; border-radius: 4px;
+    }
+    button {
+      margin-top: 1.5em; padding: 10px 15px; background-color: #2980b9;
+      color: white; border: none; border-radius: 4px; cursor: pointer;
+    }
+    button:hover { background-color: #1c5980; }
+    table {
+      width: 100%; border-collapse: collapse;
+      background: white; border-radius: 8px; overflow: hidden;
+    }
+    th, td {
+      padding: 12px 15px; text-align: center;
+      border-bottom: 1px solid #ddd;
+    }
+    th { background-color: #2980b9; color: white; }
+    tr:hover { background-color: #f1f1f1; }
+    .volver {
+  margin: 10px auto 0;   /* margen arriba 20px y auto a izquierda y derecha para centrar */
+  display: inline-block; /* tamaño ajustado al contenido */
+  background: #34495e;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 5px;
+  text-decoration: none;
+  text-align: center;
+}
+
+
+  </style>
+</head>
+<body>
+  <h2>Gestión de Clientes</h2>
+
+  <form method="POST">
+    <label for="nombre">Nombre:</label>
+    <input type="text" name="nombre" id="nombre" required />
+
+    <label for="telefono">Teléfono:</label>
+    <input type="tel" name="telefono" id="telefono" required />
+
+    <button type="submit">Agregar Cliente</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr><th>Nombre</th><th>Teléfono</th></tr>
+    </thead>
+    <tbody>
+      {% for cliente in clientes %}
+      <tr>
+        <td>{{ cliente.nombre }}</td>
+        <td>{{ cliente.telefono }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="2">No hay clientes registrados.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <a href="/menu" class="volver">Volver al Menú Principal</a>
+</body>
+</html>
+

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuentas Corrientes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Estilos para la tabla */
+        .table-responsive {
+            overflow-x: auto;
+            margin-bottom: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .table-deudas {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95em;
+        }
+        
+        .table-deudas th {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+        }
+        
+        .table-deudas td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .table-deudas tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .table-deudas tfoot th {
+            background-color: #2c3e50;
+        }
+        
+        .saldo-pendiente {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        
+        .deuda-alta {
+            background-color: #ffebee;
+        }
+        
+        .deuda-alta:hover {
+            background-color: #ffcdd2 !important;
+        }
+        
+        .no-deudas {
+            text-align: center;
+            padding: 20px !important;
+            color: #7f8c8d;
+        }
+        
+        /* Estilos para botones */
+        .btn-pagar, .btn-detalle {
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            cursor: pointer;
+            margin-right: 5px;
+            border: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-pagar {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .btn-pagar:hover {
+            background-color: #218838;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .btn-detalle {
+            background-color: #17a2b8;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-detalle:hover {
+            background-color: #138496;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        /* Estilos para el modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1050;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 25px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        .close-modal {
+            color: #aaa;
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close-modal:hover {
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        
+        .form-group textarea {
+            min-height: 80px;
+        }
+        
+        .btn-confirmar {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1em;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-confirmar:hover {
+            background-color: #218838;
+        }
+        
+        /* Botón volver al menú */
+        .btn-menu {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 20px 0;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-menu:hover {
+            background-color: #2980b9;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .table-deudas {
+                font-size: 0.85em;
+            }
+            
+            .btn-pagar, .btn-detalle {
+                padding: 6px 8px;
+                font-size: 0.8em;
+                margin-right: 3px;
+            }
+        }
+    </style>
+<body>
+    <div class="container">
+        <h3><i class="fas fa-hand-holding-usd"></i> Ventas en Cuenta Corriente</h3>
+
+        <!-- Buscador de cliente -->
+        <div style="text-align: left; margin-bottom: 10px;">
+            <input type="text" id="filtro-cliente" placeholder="Buscar cliente..." style="padding: 5px; width: 200px;">
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table-deudas">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Producto</th>
+                        <th>Total</th>
+                        <th>Pendiente</th>
+                        <th>Fecha</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if deudas %}
+                        {% for deuda in deudas %}
+                            <tr class="{% if deuda.saldo_pendiente > deuda.total * 0.5 %}deuda-alta{% endif %}">
+                                <td>{{ deuda.cliente }}</td>
+                                <td>{{ deuda.producto }} (x{{ deuda.cantidad }})</td>
+                                <td>${{ "%0.2f"|format(deuda.total) }}</td>
+                                <td class="saldo-pendiente" data-value="{{ deuda.saldo_pendiente }}">
+                                    ${{ "%0.2f"|format(deuda.saldo_pendiente) }}
+                                </td>
+                                <td>
+                                    {% if deuda.fecha is string %}
+                                        {{ deuda.fecha }}
+                                    {% else %}
+                                        {{ deuda.fecha.strftime('%d/%m/%Y') }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button class="btn-pagar" 
+                                            data-venta-id="{{ deuda.venta_id }}"
+                                            data-cliente="{{ deuda.cliente }}"
+                                            data-saldo="{{ deuda.saldo_pendiente }}">
+                                        <i class="fas fa-money-bill-wave"></i> Pagar
+                                    </button>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="no-deudas">
+                                <i class="fas fa-check-circle"></i> No hay deudas pendientes
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>TOTALES</th>
+                        <th>{{ deudas|length }} ventas</th>
+                        <th>${{ "%0.2f"|format(deudas|sum(attribute='total')) }}</th>
+                        <th class="total-pendiente">${{ "%0.2f"|format(deudas|sum(attribute='saldo_pendiente')) }}</th>
+                        <th colspan="2"></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- Modal para registrar pagos -->
+        <div id="modal-pago" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h3><i class="fas fa-money-bill-wave"></i> Registrar Pago</h3>
+                <form id="form-pago" method="POST" action="/registrar_pago_cc">
+                    <input type="hidden" name="venta_id" id="venta-id-pago">
+                    <input type="hidden" name="cliente" id="cliente-pago">
+                    
+                    <div class="form-group">
+                        <label for="monto-pago">Monto a pagar:</label>
+                        <input type="number" id="monto-pago" name="monto" min="0.01" step="0.01" required>
+                        <small>Saldo pendiente: <span id="saldo-actual">$0.00</span></small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="metodo-pago">Método de pago:</label>
+                        <select id="metodo-pago" name="metodo_pago" required>
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Transferencia">Transferencia</option>
+                            <option value="Tarjeta">Tarjeta</option>
+                            <option value="Cheque">Cheque</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="observaciones-pago">Observaciones:</label>
+                        <textarea id="observaciones-pago" name="observaciones" rows="3" placeholder="Detalles adicionales del pago"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-confirmar">
+                        <i class="fas fa-check-circle"></i> Confirmar Pago
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <a href="/menu" class="btn-menu">
+                <i class="fas fa-arrow-left"></i> Volver al Menú
+            </a>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Modal para registrar pagos
+        const modal = document.getElementById('modal-pago');
+        const btnsPagar = document.querySelectorAll('.btn-pagar');
+        const spanClose = document.querySelector('.close-modal');
+        const formPago = document.getElementById('form-pago');
+        
+        // Abrir modal al hacer clic en "Registrar Pago"
+        btnsPagar.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const ventaId = this.getAttribute('data-venta-id');
+                const cliente = this.getAttribute('data-cliente');
+                const saldo = parseFloat(this.getAttribute('data-saldo'));
+                
+                document.getElementById('venta-id-pago').value = ventaId;
+                document.getElementById('cliente-pago').value = cliente;
+                document.getElementById('monto-pago').value = saldo.toFixed(2);
+                document.getElementById('monto-pago').max = saldo;
+                document.getElementById('saldo-actual').textContent = '$' + saldo.toFixed(2);
+                
+                modal.style.display = 'block';
+            });
+        });
+        
+        // Cerrar modal
+        spanClose.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+        
+        // Cerrar modal al hacer clic fuera
+        window.addEventListener('click', function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        });
+        
+        // Validar formulario de pago
+        formPago.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const monto = parseFloat(document.getElementById('monto-pago').value);
+            const saldo = parseFloat(document.getElementById('saldo-actual').textContent.replace('$', ''));
+            
+            if (monto <= 0) {
+                alert('El monto debe ser mayor a cero');
+                return;
+            }
+            
+            if (monto > saldo) {
+                alert('El monto no puede ser mayor al saldo pendiente');
+                return;
+            }
+            
+            // Mostrar carga
+            const btnSubmit = formPago.querySelector('button[type="submit"]');
+            const originalText = btnSubmit.innerHTML;
+            btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+            btnSubmit.disabled = true;
+            
+            // Enviar formulario
+            fetch('/registrar_pago_cc', {
+                method: 'POST',
+                body: new FormData(formPago),
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Pago registrado correctamente');
+                    location.reload(); // Recargar para ver cambios
+                } else {
+                    alert('Error: ' + (data.message || 'Ocurrió un error al registrar el pago'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al conectar con el servidor');
+            })
+            .finally(() => {
+                btnSubmit.innerHTML = originalText;
+                btnSubmit.disabled = false;
+            });
+        });
+
+        // Filtro por cliente
+        const filtroInput = document.getElementById('filtro-cliente');
+        filtroInput.addEventListener('keyup', function() {
+            const filtro = this.value.toLowerCase();
+            const filas = document.querySelectorAll('.table-deudas tbody tr');
+
+            filas.forEach(fila => {
+                const celdaCliente = fila.querySelector('td');
+                if (celdaCliente) {
+                    const cliente = celdaCliente.textContent.toLowerCase();
+                    fila.style.display = cliente.includes(filtro) ? '' : 'none';
+                }
+            });
+        });
+        
+        // Formatear saldos pendientes
+        document.querySelectorAll('.saldo-pendiente').forEach(cell => {
+            const value = parseFloat(cell.getAttribute('data-value'));
+            if (value > 5000) {
+                cell.style.fontWeight = 'bold';
+            }
+            if (value > 10000) {
+                cell.style.color = '#c0392b';
+            }
+        });
+    });
+    </script>
+</body>
+
+

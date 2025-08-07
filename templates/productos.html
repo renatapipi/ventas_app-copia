@@ -3,45 +3,232 @@
 <head>
   <meta charset="UTF-8" />
   <title>Gestión de Productos</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 2em; 
+      background: #f5f7fa;
+    }
+    h2 { 
+      color: #2c3e50;
+      margin-bottom: 1em;
+      border-bottom: 2px solid #3498db;
+      padding-bottom: 0.5em;
+    }
+    .form-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5em;
+      max-width: 800px;
+    }
+    form, .filtro {
+      background: white; 
+      padding: 1.5em; 
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 1em;
+      font-weight: 600;
+      color: #34495e;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 0.5em;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 1em;
+    }
+    input:focus, select:focus {
+      border-color: #3498db;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(52,152,219,0.2);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 1em 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background-color: #3498db;
+      color: white;
+      position: sticky;
+      top: 0;
+    }
+    tr:hover {
+      background-color: #f5f5f5;
+    }
+    .mensaje {
+      margin: 1em 0;
+      padding: 12px;
+      border-radius: 5px;
+      font-weight: 500;
+    }
+    .mensaje-exito {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .mensaje-error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    .btn {
+      padding: 8px 16px;
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 1.5em;
+    }
+    .btn:hover {
+      background-color: #1c5980;
+    }
+    .btn-editar {
+      background-color: #17a2b8;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-editar:hover {
+      background-color: #138496;
+    }
+    .volver {
+      display: inline-block;
+      margin-top: 1.5em;
+      color: #3498db;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .volver:hover {
+      text-decoration: underline;
+    }
+    .required-field::after {
+      content: " *";
+      color: #e74c3c;
+    }
+    .volver-menu {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.btn-volver {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #6c757d; /* Gris Bootstrap */
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.btn-volver:hover {
+    background-color: #5a6268;
+}
+
+  </style>
 </head>
 <body>
-  <h2>Agregar Producto</h2>
-  <form method="POST">
-    <label>Nombre:</label><br />
-    <input type="text" name="nombre" required /><br />
-    <label>Costo:</label><br />
-    <input type="number" name="costo" step="0.01" required /><br />
-    <label>Ganancia:</label><br />
-    <input type="number" name="ganancia" step="0.01" required /><br />
-    <label>Marca:</label><br />
-    <input type="text" name="marca" required /><br /><br />
-    <button type="submit">Guardar Producto</button>
-  </form>
+  <h2>Gestión de Productos</h2>
 
-  <h2>Lista de Productos (se actualiza cada 5 segundos)</h2>
-  <ul id="lista-productos"></ul>
+  {% if mensaje %}
+    <div class="mensaje {% if 'error' in mensaje|lower %}mensaje-error{% else %}mensaje-exito{% endif %}">
+      {{ mensaje }}
+    </div>
+  {% endif %}
 
-  <script>
-    async function cargarProductos() {
-      const resp = await fetch('/api/productos');
-      const productos = await resp.json();
+  <div class="form-container">
+    <form method="POST" {% if producto %}action="?editar={{ producto.id }}"{% endif %}>
+      <label for="nombre" class="required-field">Nombre</label>
+      <input type="text" id="nombre" name="nombre" required value="{{ producto.nombre if producto else '' }}">
 
-      const lista = document.getElementById('lista-productos');
-      lista.innerHTML = '';
+      <label for="costo" class="required-field">Costo</label>
+      <input type="number" id="costo" name="costo" step="0.01" min="0" required 
+             value="{{ producto.costo if producto else '' }}">
 
-      productos.forEach(p => {
-        const item = document.createElement('li');
-        const precio = (parseFloat(p.costo) + parseFloat(p.ganancia)).toFixed(2);
-        item.textContent = `${p.nombre} - Precio: $${precio} - Marca: ${p.marca}`;
-        lista.appendChild(item);
-      });
-    }
+      <label for="precio" class="required-field">Precio de Venta</label>
+      <input type="number" id="precio" name="precio" step="0.01" min="0" required 
+             value="{{ producto.precio if producto else '' }}">
 
-    cargarProductos();
-    setInterval(cargarProductos, 5000);
-  </script>
+      <label for="stock" class="required-field">Stock</label>
+      <input type="number" id="stock" name="stock" min="0" required 
+             value="{{ producto.stock if producto else '' }}">
+
+      <label for="marca">Marca</label>
+      <input type="text" id="marca" name="marca" value="{{ producto.marca if producto else '' }}">
+
+      <label for="rubro">Rubro</label>
+      <input type="text" id="rubro" name="rubro" value="{{ producto.rubro if producto else '' }}">
+
+      <button type="submit" class="btn">
+        {% if producto %}Actualizar Producto{% else %}Agregar Producto{% endif %}
+      </button>
+    </form>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Costo</th>
+        <th>Precio</th>
+        <th>Stock</th>
+        <th>Marca</th>
+        <th>Rubro</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in productos %}
+      <tr>
+        <td>{{ p.nombre }}</td>
+        <td>${{ "%.2f"|format(p.costo) }}</td>
+        <td>${{ "%.2f"|format(p.precio) }}</td>
+        <td>{{ p.stock }}</td>
+        <td>{{ p.marca }}</td>
+        <td>{{ p.rubro }}</td>
+        <td>
+          <a href="?editar={{ p.id }}" class="btn-editar">Editar</a>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="7" style="text-align: center;">No hay productos registrados</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="volver-menu">
+    <a href="{{ url_for('menu') }}" class="btn-volver">Volver al Menú</a>
+</div>
+
 </body>
 </html>
+
+
+
+
+
+
 
 
 

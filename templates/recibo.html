@@ -1,0 +1,54 @@
+<head>
+  <!-- ... otros tags ... -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <div class="recibo">
+    <h1>Recibo de Venta #{{ venta.id }}</h1>
+    <p><strong>Producto:</strong> {{ venta.producto_nombre }}</p>
+    <p><strong>Cantidad:</strong> {{ venta.cantidad }}</p>
+    <p><strong>Precio Unitario:</strong> ${{ '%.2f' % (venta.ganancia + venta.costo) if venta.costo else 'N/A' }}</p>
+    <p><strong>Total:</strong> ${{ '%.2f' % venta.total }}</p>
+    <p><strong>Forma de Pago:</strong> {{ venta.forma_pago }}</p>
+    <p><strong>Cliente:</strong> {{ venta.cliente }}</p>
+    <p><strong>Fecha:</strong> {{ venta.fecha.strftime('%d/%m/%Y %H:%M') if venta.fecha else 'N/A' }}</p>
+    {% if venta.saldo_pendiente > 0 %}
+      <p><strong>Saldo Pendiente:</strong> ${{ '%.2f' % venta.saldo_pendiente }}</p>
+    {% endif %}
+  </div>
+
+  <div style="text-align: center; margin-top: 20px;">
+    <button onclick="window.print()" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">
+      Imprimir Recibo
+    </button>
+  </div>
+
+  <div style="text-align: center; margin-top: 10px;">
+    <button id="btn-descargar" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">
+      Descargar Recibo PDF
+    </button>
+  </div>
+
+  <script>
+    document.getElementById('btn-descargar').addEventListener('click', () => {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      const recibo = document.querySelector('.recibo');
+      const lines = [];
+      recibo.querySelectorAll('p, h1').forEach(el => {
+        lines.push(el.innerText);
+      });
+
+      let y = 10;
+      lines.forEach(line => {
+        doc.text(line, 10, y);
+        y += 10;
+      });
+
+      doc.save(`Recibo_Venta_{{ venta.id }}.pdf`);
+    });
+  </script>
+</body>
+
+
