@@ -15,7 +15,8 @@ def conectar():
         host="dpg-d27vskvdiees73d4ivpg-a",
         user="mongodb_srv_admin_renata82_atcluster0_user",
         password="renata82",
-        database="mongodb_srv_admin_renata82_atcluster0"
+        database="mongodb_srv_admin_renata82_atcluster0",
+    )
 
 # Decorador para verificar acceso de administrador
 def requiere_admin(f):
