@@ -12,11 +12,10 @@ app.secret_key = 'clave_super_secreta'
 # Función para conectar a la base de datos
 def conectar():
     return mysql.connector.connect(
-        host="localhost",
-        user="root",
+        host="dpg-d27vskvdiees73d4ivpg-a",
+        user="mongodb_srv_admin_renata82_atcluster0_user",
         password="renata82",
-        database="ventas_cintia"
-    )
+        database="mongodb_srv_admin_renata82_atcluster0"
 
 # Decorador para verificar acceso de administrador
 def requiere_admin(f):
