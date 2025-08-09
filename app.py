@@ -12,7 +12,7 @@ app.secret_key = 'clave_super_secreta'
 # Función para conectar a la base de datos
 def conectar():
     return mysql.connector.connect(
-        host=os.getenv("mysql-onix-stor.onrender.com"),
+        host=os.getenv("localhost"),
         user=os.getenv("root"),
         password=os.getenv("renata82"),
         database=os.getenv("ventas_cintia"),
