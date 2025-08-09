@@ -12,10 +12,11 @@ app.secret_key = 'clave_super_secreta'
 # Función para conectar a la base de datos
 def conectar():
     return mysql.connector.connect(
-        host="dpg-d27vskvdiees73d4ivpg-a",
-        user="mongodb_srv_admin_renata82_atcluster0_user",
-        password="renata82",
-        database="mongodb_srv_admin_renata82_atcluster0",
+        host=os.getenv("mysql-onix-stor.onrender.com"),
+        user=os.getenv("root"),
+        password=os.getenv("renata82"),
+        database=os.getenv("ventas_cintia"),
+        port=3306
     )
 
 # Decorador para verificar acceso de administrador
